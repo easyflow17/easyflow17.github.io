@@ -1,0 +1,703 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Super Duper Smoothie Shop!</title>
+ <!-- gygybyfvuyvuigvuycfuyffcyf -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap');
+        body {
+            font-family: 'Comic Neue', sans-serif;
+            /* Make the background super colorful and happy! */
+            background-image: linear-gradient(45deg, #FFC0CB, #FFD700, #98FB98, #ADD8E6, #FF69B4);
+            background-size: 400% 400%;
+            animation: gradient-animation 15s ease infinite;
+        }
+        @keyframes gradient-animation {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        /* Style for our custom pop-up message */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 5px solid #888;
+            width: 80%;
+            max-width: 500px;
+            text-align: center;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close-btn:hover,
+        .close-btn:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        /* Styles for the new sections */
+        .wobbly-border {
+            border-width: 5px;
+            border-style: dashed;
+            border-color: #FF00FF #FFFF00 #00FF00 #0000FF;
+            transform: rotate(-2deg);
+        }
+        .chat-container {
+            height: 250px;
+            overflow-y: auto;
+        }
+        .chat-message {
+            background-color: #f0f0f0;
+            border-radius: 15px;
+            padding: 10px;
+            margin-bottom: 8px;
+            max-width: 80%;
+        }
+        /* Game specific styles */
+        #game-container {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #ffffff;
+            background-opacity: 0.8;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            text-align: center;
+        }
+        .game-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #ff69b4;
+            margin-bottom: 1.5rem;
+        }
+        .game-controls {
+            margin-top: 1rem;
+            display: flex;
+            gap: 1rem;
+        }
+        .game-button {
+            background-color: #a78bfa;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 9999px;
+            font-size: 1.25rem;
+            font-weight: bold;
+            transition-property: all;
+            transition-duration: 300ms;
+            transform: scale(1);
+            cursor: pointer;
+        }
+        .game-button:hover {
+            transform: scale(1.1);
+            background-color: #8b5cf6;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        .card {
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            background-color: #ADD8E6;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            transform-style: preserve-3d;
+        }
+        .card.is-flipped {
+            transform: rotateY(180deg);
+        }
+        .card-inner {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+        }
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+        .card-back {
+            background-color: #FFC0CB;
+            border: 2px solid #FF69B4;
+        }
+        .card-front {
+            background-color: #98FB98;
+            border: 2px solid #00FF00;
+            transform: rotateY(180deg);
+        }
+        #rps-result, #rps-choices {
+            margin-top: 1rem;
+            font-size: 1.5rem;
+            color: #333;
+        }
+        #rps-choices button {
+            background-color: #FFD700;
+            font-size: 2rem;
+            padding: 10px 20px;
+            margin: 0 5px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+        }
+        #catch-canvas {
+            border: 5px dashed #FF69B4;
+            background-color: #e0f7fa;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center p-4 min-h-screen">
+    <!-- This is the main title of the smoothie shop! -->
+    <header class="text-center bg-white bg-opacity-80 p-6 rounded-3xl shadow-lg mt-8 mb-12">
+        <h1 class="text-5xl md:text-6xl font-extrabold text-pink-600 drop-shadow-xl animate-bounce">
+            🍓 EASYFLOW 17 Smoothie Shop! 🥭
+        </h1>
+        <p class="text-xl md:text-2xl text-purple-600 mt-4">
+            Made with love, sparkles, and a little bit of magic! ✨
+        </p>
+    </header>
+    
+    <!-- This is the container for all the main content pages -->
+    <div id="main-content" class="w-full max-w-4xl p-4 md:p-8 bg-white bg-opacity-80 rounded-3xl shadow-lg">
+        <h2 class="text-4xl text-center font-bold text-green-700 mb-8">My Yummy Smoothies!</h2>
+        
+        <!-- A grid to show off all the smoothies, it's responsive too! -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            
+            <!-- Strawberry Smoothie Card -->
+            <div class="bg-pink-300 rounded-2xl shadow-md p-6 text-center transform transition-transform duration-300 hover:scale-105">
+                <h3 class="text-3xl font-bold text-red-700 mb-2">The Strawberry Sparkle! 💖</h3>
+                <img src="https://placehold.co/150x150/f08080/FFFFFF?text=🍓" alt="Strawberry Smoothie" class="rounded-full mx-auto my-4 w-32 h-32 border-4 border-white">
+                <p class="text-lg text-red-900">
+                    Made with fresh strawberries from my garden! It's super sweet and makes you feel like royalty!
+                </p>
+            </div>
+
+            <!-- Mango Smoothie Card -->
+            <div class="bg-yellow-300 rounded-2xl shadow-md p-6 text-center transform transition-transform duration-300 hover:scale-105">
+                <h3 class="text-3xl font-bold text-orange-700 mb-2">The Mango Sunshine! ☀️</h3>
+                <img src="https://placehold.co/150x150/FFD700/FFFFFF?text=🥭" alt="Mango Smoothie" class="rounded-full mx-auto my-4 w-32 h-32 border-4 border-white">
+                <p class="text-lg text-orange-900">
+                    A tropical treat that tastes like a sunny day at the beach! Don't forget your tiny umbrella.
+                </p>
+            </div>
+
+            <!-- Blueberry Smoothie Card -->
+            <div class="bg-purple-300 rounded-2xl shadow-md p-6 text-center transform transition-transform duration-300 hover:scale-105">
+                <h3 class="text-3xl font-bold text-indigo-700 mb-2">The Berry Blast! 🫐</h3>
+                <img src="https://placehold.co/150x150/6A5ACD/FFFFFF?text=🫐" alt="Blueberry Smoothie" class="rounded-full mx-auto my-4 w-32 h-32 border-4 border-white">
+                <p class="text-lg text-indigo-900">
+                    So many berries! It's like a magical flavor explosion in your mouth. Best served with joy!
+                </p>
+            </div>
+
+            <!-- Chocolate Banana Smoothie Card -->
+            <div class="bg-brown-300 rounded-2xl shadow-md p-6 text-center transform transition-transform duration-300 hover:scale-105">
+                <h3 class="text-3xl font-bold text-yellow-800 mb-2">The Choco-Monkey! 🍌</h3>
+                <img src="https://placehold.co/150x150/DEB887/FFFFFF?text=🍌" alt="Chocolate Banana Smoothie" class="rounded-full mx-auto my-4 w-32 h-32 border-4 border-white">
+                <p class="text-lg text-yellow-900">
+                    Chocolate AND banana! It's my favorite combo ever. Perfect for when you're feeling silly.
+                </p>
+            </div>
+
+        </div>
+
+        <!-- Section about why these smoothies are so special! -->
+        <div class="text-center mt-12 bg-white bg-opacity-80 p-6 rounded-3xl shadow-lg">
+            <h3 class="text-3xl font-bold text-blue-700 mb-4">Why My Smoothies Are Awesome!</h3>
+            <p class="text-xl text-blue-900">
+                They're made with lots of yummy fruit and zero unhealty stuff they are super healthy, which is great! And they are made with my own special, secret recipe... Shhhh! 🤫
+            </p>
+        </div>
+
+        <!-- The order section -->
+        <section class="mt-12 text-center">
+            <h2 class="text-4xl font-bold text-red-700 mb-6">Want a Smoothie?!</h2>
+            <button id="orderButton" class="bg-yellow-400 text-yellow-900 font-bold py-4 px-8 rounded-full text-2xl shadow-xl transition-transform duration-300 transform hover:scale-110 active:scale-95">
+                Click Here to Order! ✨
+            </button>
+        </section>
+
+        <!-- The Games and Membership buttons -->
+        <div class="mt-8 flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+            <button onclick="showPage('games')" class="game-button">Play Games! 🕹️</button>
+            <button onclick="showPage('membership')" class="game-button">Join the VIP Club! 👑</button>
+        </div>
+    </div>
+    
+    <!-- The games section (initially hidden) -->
+    <section id="games-content" class="hidden mt-12 w-full max-w-4xl p-4 md:p-8 bg-yellow-200 rounded-3xl shadow-lg">
+        <h2 class="text-4xl text-center font-bold text-pink-700 mb-6">Let's Play Games! 🎮</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- Game Card 1 -->
+            <div class="bg-green-300 rounded-2xl shadow-md p-6 text-center transform transition-transform duration-300 hover:scale-105">
+                <h3 class="text-3xl font-bold text-green-800 mb-2">Memory Match! 🧠</h3>
+                <img src="https://placehold.co/150x150/98FB98/FFFFFF?text=🍎" alt="Memory Match Game" class="rounded-full mx-auto my-4 w-32 h-32 border-4 border-white">
+                <p class="text-lg text-green-900">
+                    Tap the cards to find matching fruit emojis! Can you find them all?
+                </p>
+                <button onclick="loadGame('memory')" class="mt-4 bg-purple-400 text-purple-900 font-bold py-2 px-6 rounded-full shadow-md hover:scale-105">
+                    Play!
+                </button>
+            </div>
+            <!-- Game Card 2 -->
+            <div class="bg-blue-300 rounded-2xl shadow-md p-6 text-center transform transition-transform duration-300 hover:scale-105">
+                <h3 class="text-3xl font-bold text-blue-800 mb-2">Rock, Paper, Scissors! ✂️</h3>
+                <img src="https://placehold.co/150x150/ADD8E6/FFFFFF?text=🪨" alt="Rock Paper Scissors Game" class="rounded-full mx-auto my-4 w-32 h-32 border-4 border-white">
+                <p class="text-lg text-blue-900">
+                    A super fun guessing game against the computer!
+                </p>
+                <button onclick="loadGame('rps')" class="mt-4 bg-purple-400 text-purple-900 font-bold py-2 px-6 rounded-full shadow-md hover:scale-105">
+                    Play!
+                </button>
+            </div>
+            <!-- Game Card 3 -->
+            <div class="bg-red-300 rounded-2xl shadow-md p-6 text-center transform transition-transform duration-300 hover:scale-105">
+                <h3 class="text-3xl font-bold text-red-800 mb-2">Catch the Fruit! 🍓</h3>
+                <img src="https://placehold.co/150x150/FF69B4/FFFFFF?text=🧺" alt="Catch the Fruit Game" class="rounded-full mx-auto my-4 w-32 h-32 border-4 border-white">
+                <p class="text-lg text-red-900">
+                    Move the basket to catch all the yummy smoothie ingredients!
+                </p>
+                <button onclick="loadGame('catch')" class="mt-4 bg-purple-400 text-purple-900 font-bold py-2 px-6 rounded-full shadow-md hover:scale-105">
+                    Play!
+                </button>
+            </div>
+        </div>
+        <!-- The container for the games to be displayed -->
+        <div id="game-container"></div>
+        <button onclick="showPage('main')" class="game-button mt-8">Go Back</button>
+    </section>
+
+    <!-- The membership page (initially hidden) -->
+    <section id="membership-content" class="hidden mt-12 w-full max-w-4xl p-4 md:p-8 bg-pink-200 rounded-3xl shadow-lg text-center">
+        <h2 class="text-4xl font-bold text-purple-700 mb-6">👑 Super Duper Smoothie VIP Club! 👑</h2>
+        <p class="text-2xl text-pink-800 mb-4">
+            Join our special club and get awesome stuff!
+        </p>
+        <ul class="text-xl text-left inline-block list-disc list-inside space-y-2">
+            <li>A secret smoothie recipe every month!</li>
+            <li>you can get a free cookie,cake or muffin for your next order.</li>
+            <li>A fun certificate to hang on your wall!</li>
+            <li>A shiny VIP badge to show all your friends!</li>
+        </ul>
+        <button onclick="showModal('Welcome, VIP!', 'You are now an official member of the club!')" class="game-button mt-8">Join Now!</button>
+        <button onclick="showPage('main')" class="game-button mt-4">Go Back</button>
+    </section>
+
+    <!-- The chatbot section -->
+    <section class="mt-12 w-full max-w-lg p-6 bg-pink-100 rounded-2xl shadow-xl wobbly-border">
+        <h2 class="text-4xl text-center font-bold text-purple-700 mb-4 transform -rotate-1">
+            Chat with GiggleBot! 🤖
+        </h2>
+        <div id="chatBox" class="chat-container bg-white p-4 rounded-xl shadow-inner mb-4 flex flex-col justify-end">
+            <div class="chat-message bg-yellow-200 self-start">
+                <p>Hi! I'm GiggleBot! Ask me a silly question! 😜</p>
+            </div>
+        </div>
+        <div class="flex items-center">
+            <input type="text" id="chatInput" placeholder="What you wanna say?" class="flex-grow p-3 rounded-l-full border-2 border-green-500 focus:outline-none">
+            <button id="sendButton" class="bg-blue-400 text-white font-bold p-3 rounded-r-full hover:bg-blue-500 active:bg-blue-600">
+                Send!
+            </button>
+        </div>
+    </section>
+
+    <!-- The custom pop-up message box -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <p id="modalMessage" class="text-3xl font-bold text-pink-600 animate-pulse">✨ Yay! ✨</p>
+            <p id="modalSubMessage" class="text-xl mt-4 text-purple-700">
+                Your smoothie order is being made! I'll be right there!
+            </p>
+            <p class="text-lg mt-2 text-green-700">
+                (Maybe I'll put a little note on the bottom of the cup!)
+            </p>
+        </div>
+    </div>
+
+    <!-- The JavaScript part to make the buttons and chatbot work -->
+    <script>
+        // Get all the important things from the page
+        const orderButton = document.getElementById('orderButton');
+        const modal = document.getElementById('myModal');
+        const closeBtn = document.getElementsByClassName('close-btn')[0];
+        const modalMessage = document.getElementById('modalMessage');
+        const modalSubMessage = document.getElementById('modalSubMessage');
+        const gameContainer = document.getElementById('game-container');
+        const chatInput = document.getElementById('chatInput');
+        const sendButton = document.getElementById('sendButton');
+        const chatBox = document.getElementById('chatBox');
+        
+        // Page content sections
+        const mainContent = document.getElementById('main-content');
+        const gamesContent = document.getElementById('games-content');
+        const membershipContent = document.getElementById('membership-content');
+        const chatbotContent = document.querySelector('section.wobbly-border');
+
+        // This function shows our custom pop-up message
+        function showModal(message, subMessage = "") {
+            modalMessage.textContent = message;
+            modalSubMessage.textContent = subMessage;
+            modal.style.display = 'block';
+        }
+
+        // When the user clicks the order button, show the order modal
+        orderButton.onclick = function() {
+            showModal("✨ Yay! ✨", "Your smoothie order is being made! I'll be right there!");
+            // And also add a little message to GiggleBot's chat
+            addChatMessage('You just ordered a smoothie!', 'user');
+            setTimeout(() => {
+                addChatMessage("Wow! Smoothie yummy!", 'GiggleBot');
+            }, 1000);
+        }
+
+        // When the user clicks the "x" button, hide the modal
+        closeBtn.onclick = function() {
+            modal.style.display = 'none';
+        }
+
+        // When the user clicks anywhere outside the modal, hide it
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Function to add a new message to the chat
+        function addChatMessage(message, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.textContent = message;
+            messageDiv.classList.add('chat-message');
+            if (sender === 'user') {
+                messageDiv.classList.add('self-end', 'bg-blue-200');
+            } else {
+                messageDiv.classList.add('self-start', 'bg-yellow-200');
+            }
+            chatBox.appendChild(messageDiv);
+            // Scroll to the bottom to see the newest message
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // Fun and friendly AI chatbot logic
+        async function getGiggleBotResponse(userMessage) {
+            const systemPrompt = "You are a very silly, very friendly AI for a kid's website. Your name is GiggleBot. You love smoothies and games. Your responses must be short, playful, and fun. You must tell silly jokes or riddles related to fruit, smoothies, or food. You can't answer complex questions, just silly ones.";
+            const apiKey = ""
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+            const payload = {
+                contents: [{ parts: [{ text: userMessage }] }],
+                systemInstruction: {
+                    parts: [{ text: systemPrompt }]
+                },
+            };
+            
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                const text = result?.candidates?.[0]?.content?.parts?.[0]?.text || "GiggleBot is having a nap right now!";
+                return text;
+            } catch (error) {
+                console.error("GiggleBot API error:", error);
+                return "Uh oh, my circuits are ticklish! Try again!";
+            }
+        }
+        
+        // When the user clicks the "Send!" button
+        sendButton.onclick = async function() {
+            const userMessage = chatInput.value.trim();
+            if (userMessage) {
+                addChatMessage(userMessage, 'user');
+                chatInput.value = ''; // Clear the input field
+                
+                // Show a "thinking" message from GiggleBot
+                const thinkingMessage = "GiggleBot is thinking...";
+                addChatMessage(thinkingMessage, 'GiggleBot');
+                
+                const aiResponse = await getGiggleBotResponse(userMessage);
+                
+                // Remove the "thinking" message and add the real response
+                const messages = chatBox.getElementsByClassName('chat-message');
+                messages[messages.length - 1].remove();
+                addChatMessage(aiResponse, 'GiggleBot');
+            }
+        }
+
+        // Also make the "Enter" key work for sending messages
+        chatInput.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                sendButton.click();
+            }
+        });
+
+        // Function to show only one section at a time
+        function showPage(pageName) {
+            mainContent.classList.add('hidden');
+            gamesContent.classList.add('hidden');
+            membershipContent.classList.add('hidden');
+            chatbotContent.classList.add('hidden');
+
+            if (pageName === 'main') {
+                mainContent.classList.remove('hidden');
+                chatbotContent.classList.remove('hidden');
+                gameContainer.innerHTML = '';
+            } else if (pageName === 'games') {
+                gamesContent.classList.remove('hidden');
+                chatbotContent.classList.remove('hidden');
+            } else if (pageName === 'membership') {
+                membershipContent.classList.remove('hidden');
+                chatbotContent.classList.remove('hidden');
+            }
+        }
+
+        // This function will load and start a game when a button is clicked
+        function loadGame(gameName) {
+            gameContainer.innerHTML = ''; // Clear the game area first
+            if (gameName === 'memory') {
+                loadMemoryGame();
+            } else if (gameName === 'rps') {
+                loadRPSGame();
+            } else if (gameName === 'catch') {
+                loadCatchGame();
+            }
+        }
+
+        // --- Memory Match Game Logic ---
+        function loadMemoryGame() {
+            const fruits = ['🍓', '🍌', '🥭', '🫐', '🍍', '🍉', '🥝', '🍇'];
+            const gameEmojis = [...fruits, ...fruits].sort(() => Math.random() - 0.5);
+            let flippedCards = [];
+            let matchedPairs = 0;
+            let canFlip = true;
+            
+            const gameHtml = `
+                <h3 class="game-title">Memory Match!</h3>
+                <div class="grid-container max-w-sm">
+                    ${gameEmojis.map((emoji, index) => `
+                        <div class="card" data-index="${index}" data-emoji="${emoji}">
+                            <div class="card-inner">
+                                <div class="card-face card-back"></div>
+                                <div class="card-face card-front">${emoji}</div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                <button onclick="loadGame('memory')" class="game-button mt-4">Play Again!</button>
+            `;
+            gameContainer.innerHTML = gameHtml;
+            
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => card.addEventListener('click', flipCard));
+            
+            function flipCard() {
+                if (!canFlip || flippedCards.length === 2 || this.classList.contains('is-flipped')) {
+                    return;
+                }
+                
+                this.classList.add('is-flipped');
+                flippedCards.push(this);
+                
+                if (flippedCards.length === 2) {
+                    canFlip = false;
+                    setTimeout(checkForMatch, 1000);
+                }
+            }
+            
+            function checkForMatch() {
+                const [card1, card2] = flippedCards;
+                const isMatch = card1.dataset.emoji === card2.dataset.emoji;
+                
+                if (isMatch) {
+                    matchedPairs++;
+                    card1.removeEventListener('click', flipCard);
+                    card2.removeEventListener('click', flipCard);
+                } else {
+                    card1.classList.remove('is-flipped');
+                    card2.classList.remove('is-flipped');
+                }
+                
+                flippedCards = [];
+                canFlip = true;
+                
+                if (matchedPairs === fruits.length) {
+                    setTimeout(() => showModal('You Won!', 'You matched all the smoothie ingredients!'), 500);
+                }
+            }
+        }
+
+        // --- Rock, Paper, Scissors Game Logic ---
+        function loadRPSGame() {
+            const choices = ['🪨', '📄', '✂️'];
+            const gameHtml = `
+                <h3 class="game-title">Rock, Paper, Scissors!</h3>
+                <div class="text-center">
+                    <p id="rps-result" class="text-3xl font-bold">Choose your weapon!</p>
+                    <div id="rps-choices" class="mt-4 flex justify-center space-x-4">
+                        <button onclick="playRPS('🪨')">🪨</button>
+                        <button onclick="playRPS('📄')">📄</button>
+                        <button onclick="playRPS('✂️')">✂️</button>
+                    </div>
+                </div>
+                <button onclick="loadGame('rps')" class="game-button mt-4">Play Again!</button>
+            `;
+            gameContainer.innerHTML = gameHtml;
+        }
+        
+        function playRPS(playerChoice) {
+            const choices = ['🪨', '📄', '✂️'];
+            const computerChoice = choices[Math.floor(Math.random() * choices.length)];
+            let result = '';
+
+            if (playerChoice === computerChoice) {
+                result = "It's a tie!";
+            } else if (
+                (playerChoice === '🪨' && computerChoice === '✂️') ||
+                (playerChoice === '📄' && computerChoice === '🪨') ||
+                (playerChoice === '✂️' && computerChoice === '📄')
+            ) {
+                result = "You win! Yay!";
+            } else {
+                result = "You lose! Awww.";
+            }
+
+            document.getElementById('rps-result').textContent = `You chose ${playerChoice}, I chose ${computerChoice}. ${result}`;
+        }
+
+        // --- Catch the Fruit Game Logic ---
+        function loadCatchGame() {
+            const gameHtml = `
+                <h3 class="game-title">Catch the Fruit!</h3>
+                <canvas id="catch-canvas" width="400" height="400"></canvas>
+                <div class="mt-4 text-2xl font-bold">
+                    Score: <span id="catch-score">0</span>
+                </div>
+                <button onclick="loadGame('catch')" class="game-button mt-4">Play Again!</button>
+            `;
+            gameContainer.innerHTML = gameHtml;
+
+            const canvas = document.getElementById('catch-canvas');
+            const ctx = canvas.getContext('2d');
+            const scoreDisplay = document.getElementById('catch-score');
+            
+            let basketX = canvas.width / 2 - 25;
+            const basketWidth = 50;
+            const basketHeight = 10;
+            let fruits = [];
+            let score = 0;
+
+            function update() {
+                // Clear the canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Draw the basket
+                ctx.fillStyle = '#ff69b4';
+                ctx.fillRect(basketX, canvas.height - basketHeight - 10, basketWidth, basketHeight);
+
+                // Update and draw fruits
+                for (let i = 0; i < fruits.length; i++) {
+                    let fruit = fruits[i];
+                    fruit.y += fruit.speed;
+                    ctx.font = '24px Comic Neue';
+                    ctx.fillText(fruit.emoji, fruit.x, fruit.y);
+
+                    // Check for collision
+                    if (fruit.y + 24 >= canvas.height - basketHeight - 10 && fruit.x > basketX && fruit.x < basketX + basketWidth) {
+                        score++;
+                        scoreDisplay.textContent = score;
+                        fruits.splice(i, 1);
+                        i--;
+                    }
+                    
+                    // Remove if missed
+                    if (fruit.y > canvas.height) {
+                        fruits.splice(i, 1);
+                        i--;
+                    }
+                }
+                
+                // Add new fruit randomly
+                if (Math.random() < 0.02) {
+                    const fruitEmojis = ['🍓', '🍌', '🥭', '🫐', '🍍', '🍉', '🥝', '🍇'];
+                    fruits.push({
+                        x: Math.random() * (canvas.width - 24),
+                        y: 0,
+                        speed: Math.random() * 2 + 1,
+                        emoji: fruitEmojis[Math.floor(Math.random() * fruitEmojis.length)]
+                    });
+                }
+
+                requestAnimationFrame(update);
+            }
+
+            // Move the basket with mouse or touch
+            canvas.addEventListener('mousemove', (e) => {
+                basketX = e.offsetX - basketWidth / 2;
+            });
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                basketX = (touch.clientX - rect.left) * scaleX - basketWidth / 2;
+            });
+
+            requestAnimationFrame(update);
+        }
+
+        // Initial call to set up the window's event handler
+        window.onload = function() {
+            // Nothing to do on load right now, but good practice to keep!
+        }
+    </script>
+</body>
+</html>
